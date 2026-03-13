@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             txtPretraga = new TextBox();
             cmbStatus = new ComboBox();
             dgvPodaci = new DataGridView();
@@ -43,7 +44,7 @@
             // 
             txtPretraga.Location = new Point(35, 46);
             txtPretraga.Name = "txtPretraga";
-            txtPretraga.Size = new Size(285, 31);
+            txtPretraga.Size = new Size(342, 31);
             txtPretraga.TabIndex = 0;
             txtPretraga.TextChanged += txtPretraga_TextChanged;
             // 
@@ -51,7 +52,7 @@
             // 
             cmbStatus.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbStatus.FormattingEnabled = true;
-            cmbStatus.Location = new Point(339, 42);
+            cmbStatus.Location = new Point(393, 42);
             cmbStatus.Name = "cmbStatus";
             cmbStatus.Size = new Size(158, 33);
             cmbStatus.TabIndex = 1;
@@ -59,19 +60,28 @@
             // 
             // dgvPodaci
             // 
-            dgvPodaci.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgvPodaci.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = SystemColors.Control;
+            dataGridViewCellStyle1.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.False;
+            dgvPodaci.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             dgvPodaci.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvPodaci.Location = new Point(35, 94);
             dgvPodaci.Name = "dgvPodaci";
+            dgvPodaci.ReadOnly = true;
             dgvPodaci.RowHeadersWidth = 62;
-            dgvPodaci.Size = new Size(847, 345);
+            dgvPodaci.Size = new Size(1060, 345);
             dgvPodaci.TabIndex = 2;
             dgvPodaci.CellClick += dgvPodaci_CellClick;
             dgvPodaci.CellDoubleClick += dgvPodaci_CellDoubleClick;
             // 
             // btnKompanijaAdd
             // 
-            btnKompanijaAdd.Location = new Point(547, 42);
+            btnKompanijaAdd.Location = new Point(742, 40);
             btnKompanijaAdd.Name = "btnKompanijaAdd";
             btnKompanijaAdd.Size = new Size(176, 34);
             btnKompanijaAdd.TabIndex = 3;
@@ -81,7 +91,7 @@
             // 
             // btnPraksaAdd
             // 
-            btnPraksaAdd.Location = new Point(729, 42);
+            btnPraksaAdd.Location = new Point(942, 40);
             btnPraksaAdd.Name = "btnPraksaAdd";
             btnPraksaAdd.Size = new Size(153, 34);
             btnPraksaAdd.TabIndex = 4;
@@ -91,7 +101,7 @@
             // 
             // btnPrint
             // 
-            btnPrint.Location = new Point(770, 459);
+            btnPrint.Location = new Point(983, 466);
             btnPrint.Name = "btnPrint";
             btnPrint.Size = new Size(112, 34);
             btnPrint.TabIndex = 5;
@@ -111,7 +121,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(339, 16);
+            label2.Location = new Point(393, 16);
             label2.Name = "label2";
             label2.Size = new Size(60, 25);
             label2.TabIndex = 7;
@@ -121,7 +131,7 @@
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(924, 505);
+            ClientSize = new Size(1132, 523);
             Controls.Add(label2);
             Controls.Add(label1);
             Controls.Add(btnPrint);

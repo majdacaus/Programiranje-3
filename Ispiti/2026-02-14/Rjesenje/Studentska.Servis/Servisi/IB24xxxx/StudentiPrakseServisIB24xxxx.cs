@@ -12,13 +12,12 @@ namespace Studentska.Servis.Servisi.IB24xxxx
     {
         public override List<StudentiPrakseIB24xxxx> GetAll()
         {
-            if (_dbContext == null) return new List<StudentiPrakseIB24xxxx>();
+            if (_dbContext == null) return [];
 
-            return _dbContext.Set<StudentiPrakseIB24xxxx>() 
+            return [.. _dbContext.Set<StudentiPrakseIB24xxxx>()
                 .Include(x => x.Student)
                 .Include(x => x.Kompanija)
-                    .ThenInclude(k => k.Grad)
-                .ToList();
+                    .ThenInclude(k => k.Grad)];
         }
     }
 }

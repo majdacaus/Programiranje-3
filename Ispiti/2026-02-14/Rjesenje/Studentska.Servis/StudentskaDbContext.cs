@@ -25,6 +25,6 @@ namespace Studentska.Servis
         public DbSet<Predmet> Predmeti { get; set; }
         public DbSet<AkademskaGodina> AkademskeGodine { get; set; }
         public DbSet<KompanijeIB24xxxx> Kompanije {  get; set; }
-        public DbSet<StudentiPrakseIB24xxxx> StudentiPrakse {  get; set; }
+        public DbSet<StudentiPrakseIB24xxxx> StudentiPrakseIB24xxxx {  get; set; }
     }
 }

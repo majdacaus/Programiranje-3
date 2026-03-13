@@ -36,6 +36,7 @@
         public void Dispose()
         {
             _dbContext.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

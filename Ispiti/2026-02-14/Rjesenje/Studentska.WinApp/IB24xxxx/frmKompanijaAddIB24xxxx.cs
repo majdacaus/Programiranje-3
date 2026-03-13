@@ -14,17 +14,14 @@ namespace Studentska.WinApp.IB24xxxx
     public partial class frmKompanijaAddIB24xxxx : Form
     {
         string urlPattern = @"^www\.[a-zA-Z]{2,}\.[a-zA-Z]{2,}$";
-
         public frmKompanijaAddIB24xxxx()
         {
             InitializeComponent();
         }
         private void frmKompanijaAddIB24xxxx_Load(object sender, EventArgs e)
         {
-            using (var gradoviServis = new GradServis())
-            {
-                Ekstenzije.UcitajPodatke(cmbGrad, gradoviServis.GetAll());
-            }
+            using var gradoviServis = new GradServis();
+            cmbGrad.UcitajPodatke(gradoviServis.GetAll());
             cbAktivna.Checked = true;
         }
         bool ValidnaForma()
@@ -33,41 +30,40 @@ namespace Studentska.WinApp.IB24xxxx
                            Validator.ValidanUnos(txtAdresa, err) &&
                            Validator.ValidanUnos(txtURL, err) &&
                            Validator.ValidanUnos(cmbGrad, err) &&
-                           Validator.ValidanUnos(txtMaxStudenata, err);
-            if (!validno) return false;
+                           Validator.ValidanUnos(txtMaxStudenata, err) &&
+                           Validator.ValidanUnos(pbSlika, err);
 
-            if (!Regex.IsMatch(txtURL.Text, urlPattern))
+            if (!validno) { return false; }
+            else if (!Regex.IsMatch(txtURL.Text, urlPattern))
             {
                 err.SetError(txtURL, "Format mora biti www.xx.xx");
-                MessageBox.Show("Format URL-a mora biti www.xx.xx");
-                validno = false;
+                return false;
             }
-
-            if (int.TryParse(txtMaxStudenata.Text, out int max) && max < 0)
+            else if (int.TryParse(txtMaxStudenata.Text, out int max) && max < 0)
             {
                 err.SetError(txtMaxStudenata, "Broj studenata ne moze bit negativan");
-                MessageBox.Show("Broj studenata ne moze bit negativan");
-                validno = false;
+                return false;
             }
 
-            var naziv = txtNaziv.Text;
-            var gradId = (int)cmbGrad.SelectedValue;
-            using (var servis = new KompanijeServisIB24xxxx())
+            string nazivKompanije = txtNaziv.Text;
+            int gradId = (int)cmbGrad.SelectedValue!;
+
+            using var servis = new KompanijeServisIB24xxxx();
+
+            if (servis.GetAll().Any(x => x.Naziv.ToLower() == nazivKompanije.ToLower() && x.GradId == gradId))
             {
-                if (servis.GetAll().Any(x => x.Naziv.ToLower() == naziv.ToLower() && x.GradId == gradId))
-                {
-                    MessageBox.Show($"Kompanija '{naziv}' je vec dodana za odabrani grad");
-                    validno = false;
-                }
+                MessageBox.Show($"Kompanija '{nazivKompanije}' je vec dodana za odabrani grad");
+                return false;
             }
-            return validno;
+
+            return true;
         }
         private void Dodaj()
         {
             if (!ValidnaForma()) return;
 
-            using (var servis = new KompanijeServisIB24xxxx())
-            {
+            using var servis = new KompanijeServisIB24xxxx();
+            
                 var nova = new KompanijeIB24xxxx
                 {
                     Naziv = txtNaziv.Text,
@@ -76,15 +72,11 @@ namespace Studentska.WinApp.IB24xxxx
                     GradId = (int)cmbGrad.SelectedValue,
                     MaxStudenata = int.Parse(txtMaxStudenata.Text),
                     Logo = ImageHelper.ImageToByte(pbSlika.Image),
-                    Aktivna = cbAktivna.Checked ? true : false
+                    Aktivna = cbAktivna.Checked
                 };
 
                 servis.Add(nova);
-
                 MessageBox.Show("Kompanija uspjesno dodana");
-                this.DialogResult = DialogResult.OK;
-                this.Close();
-            }
         }
         private void btnSacuvaj_Click(object sender, EventArgs e)
         {
@@ -92,7 +84,9 @@ namespace Studentska.WinApp.IB24xxxx
         }
         private void pbSlika_DoubleClick(object sender, EventArgs e)
         {
-            var ofd = new OpenFileDialog();
+            using var ofd = new OpenFileDialog();
+            ofd.Filter = "Slike|*.jpg;*.jpeg;*.png;*.bmp"; //opcionalno
+
             if (ofd.ShowDialog() == DialogResult.OK)
             {
                 pbSlika.Image = Image.FromFile(ofd.FileName);

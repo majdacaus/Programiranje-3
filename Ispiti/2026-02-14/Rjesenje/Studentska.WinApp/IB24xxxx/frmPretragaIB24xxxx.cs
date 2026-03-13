@@ -41,7 +41,6 @@ namespace Studentska.WinApp.IB24xxxx
                 Student = x.Student.IndeksImePrezime,
                 Kompanija = x.Kompanija.Naziv,
                 Grad = x.Kompanija.Grad.Naziv,
-                DatumPrijave = x.DatumPrijave,
                 Status = x.Status.ToString(),
                 DatumPromjeneStatusa = x.DatumPromjeneStatusa
             }).ToList();
@@ -49,42 +48,40 @@ namespace Studentska.WinApp.IB24xxxx
             dgvPodaci.DataSource = null;
             dgvPodaci.DataSource = podaci;
 
-            var obrisi = new DataGridViewButtonColumn();
-            obrisi.Name = "Obrisi";
-            obrisi.UseColumnTextForButtonValue = true;
-            obrisi.Text = "Obrisi";
+            var obrisi = new DataGridViewButtonColumn
+            {
+                Name = "Obrisi",
+                HeaderText = string.Empty,
+                Text = "Obrisi",
+                UseColumnTextForButtonValue = true,
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+            };
 
             dgvPodaci.Columns.Add(obrisi);
-
             dgvPodaci.Columns["Id"].Visible = false;
+        }
+        private void UcitajStatuse()
+        {
+            var statusi = Enum.GetValues(typeof(StatusPrakse)).Cast<object>().ToList();
+            statusi.Insert(0, "(Svi statusi)");
+            cmbStatus.DataSource = statusi;
         }
         private void frmPretragaIB24xxxx_Load(object sender, EventArgs e)
         {
-            var servis = new StudentiPrakseServisIB24xxxx();
-            var statusi = servis.GetAll().Select(x => x.Status).Distinct().ToList();
-            cmbStatus.DataSource = statusi;
-
+            UcitajStatuse();
             UcitajPodatke();
         }
-        private void btnKompanijaAdd_Click(object sender, EventArgs e)
-        {
-            var frm = new frmKompanijaAddIB24xxxx();
-            frm.ShowDialog();
-        }
-        private void btnPraksaAdd_Click(object sender, EventArgs e)
-        {
-            var frm = new frmStudentiPrakseAddEditIB24xxxx();
-            if (frm.ShowDialog() == DialogResult.OK)
-                UcitajPodatke();
-        }
+        private void btnKompanijaAdd_Click(object sender, EventArgs e) => 
+            new frmKompanijaAddIB24xxxx().PrikaziFormu(() => UcitajPodatke());
+        private void btnPraksaAdd_Click(object sender, EventArgs e) =>
+            new frmStudentiPrakseAddEditIB24xxxx().PrikaziFormu(() => UcitajPodatke());
         private void btnPrint_Click(object sender, EventArgs e)
         {
             var podaci = dgvPodaci.DataSource as List<ViewModelIB24xxxx>;
 
             if (podaci != null && podaci.Count > 0)
             {
-                var frm = new frmIzvjestaji(podaci);
-                frm.ShowDialog();
+                new frmIzvjestaji(podaci).PrikaziFormu();
             }
             else
             {
@@ -94,7 +91,8 @@ namespace Studentska.WinApp.IB24xxxx
         private void Filtriraj()
         {
             var tekst = txtPretraga.Text.ToLower();
-            var statusFilter = cmbStatus.SelectedItem?.ToString();
+
+            var odabraniIndex = cmbStatus.SelectedIndex;
 
             UcitajPodatke(x =>
                 (string.IsNullOrEmpty(tekst) ||
@@ -102,7 +100,7 @@ namespace Studentska.WinApp.IB24xxxx
                  x.Student.Prezime.ToLower().Contains(tekst) ||
                  x.Kompanija.Naziv.ToLower().Contains(tekst))
                 &&
-                (statusFilter == null || x.Status.ToString() == statusFilter)
+                (odabraniIndex == 0 || x.Status.ToString() == cmbStatus.SelectedItem?.ToString())
             );
         }
         private void cmbStatus_SelectedIndexChanged(object sender, EventArgs e)
@@ -141,6 +139,8 @@ namespace Studentska.WinApp.IB24xxxx
         }
         private void dgvPodaci_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
+            if (e.RowIndex < 0) return;
+
             var odabranaPraksa = dgvPodaci.Rows[e.RowIndex].DataBoundItem as ViewModelIB24xxxx;
 
             if (odabranaPraksa != null)
@@ -148,10 +148,7 @@ namespace Studentska.WinApp.IB24xxxx
                 var servis = new StudentiPrakseServisIB24xxxx();
                 var odabran = servis.GetAll().FirstOrDefault(x => x.Id == odabranaPraksa.Id);
 
-                var frm = new frmStudentiPrakseAddEditIB24xxxx(odabran.Id);
-
-                if (frm.ShowDialog() == DialogResult.OK)
-                    UcitajPodatke();
+                new frmStudentiPrakseAddEditIB24xxxx(odabran?.Id).PrikaziFormu(() => UcitajPodatke());
             }
         }
     }
